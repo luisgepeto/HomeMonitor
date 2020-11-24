@@ -54,7 +54,6 @@ function getLogEntriesForList(filePaths, callback) {
 
       if(!hasError){
         var parsedData = JSON.parse(contents);
-        console.log('appending data', parsedData);
         logs = logs.concat(parsedData);            
       }      
     }
