@@ -1,5 +1,5 @@
 FROM node:8-alpine
-WORKDIR /opt/tplink-monitor
+WORKDIR /app
 COPY . .
 RUN npm install
 EXPOSE 3000
