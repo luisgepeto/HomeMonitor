@@ -11,28 +11,8 @@ let logIntervalMs;
 loadLogConfig();
 
 function loadLogConfig() {
-  try {
-    // Use logger config file specified on command line, otherwise use default one.
-    if (process.argv.length > 2) {
-      loggerConfigPath = process.argv[2];
-    } else {
-      loggerConfigPath = 'logger-config.json';
-    }
-    console.log('Logger config file: "' + loggerConfigPath + '"')
-
-    let config  = JSON.parse(fs.readFileSync(loggerConfigPath, 'utf8'));
-    logDirPath = config.logDirPath;
-    logIntervalMs = (config.logIntervalSeconds * 1000);
-  }
-  catch (err) {
-    console.warn('Error reading logger config. Reverting to defaults.', err);
-    logDirPath = '.'      // Current directory
-    logIntervalMs = 60000 // 1 min
-  }
-
-  // Create log directory path if it doesn't already exist.
-  console.log('Log directory path: "' + logDirPath + '"')
-  shell.mkdir('-p', logDirPath);
+  logDirPath = process.env.LOG_DIR_PATH || '.';
+  logIntervalMs = (process.env.LOG_INTERVAL_SECONDS || 60 )* 1000;
 }
 
 function startLogging(device) {

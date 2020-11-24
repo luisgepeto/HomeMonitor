@@ -1,3 +1,8 @@
+# Env variables
+
+LOG_DIR_PATH
+LOG_INTERVAL_SECONDS
+PORT
 # TPLink Energy Monitor
 [![Build Status](https://travis-ci.org/jamesbarnett91/tplink-energy-monitor.svg?branch=master)](https://travis-ci.org/jamesbarnett91/tplink-energy-monitor)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=tplink-monitor&metric=alert_status)](https://sonarcloud.io/dashboard?id=tplink-monitor)

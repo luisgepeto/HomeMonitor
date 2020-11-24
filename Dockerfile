@@ -1,4 +1,4 @@
-FROM node:8-alpine
+FROM arm32v7/node:8.11-slim
 WORKDIR /app
 COPY . .
 RUN npm install
