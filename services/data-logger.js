@@ -2,10 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const shell = require('shelljs');
 const dataBroadcaster = require('./data-broadcaster');
+const { DateTime } = require('luxon');
+const glob = require('glob');
 
 let logDirPath;
 let logIntervalMs;
-let maxLogEntries;
 
 loadLogConfig();
 
@@ -22,14 +23,11 @@ function loadLogConfig() {
     let config  = JSON.parse(fs.readFileSync(loggerConfigPath, 'utf8'));
     logDirPath = config.logDirPath;
     logIntervalMs = (config.logIntervalSeconds * 1000);
-    maxLogEntries = config.maxLogEntries;
-
   }
   catch (err) {
     console.warn('Error reading logger config. Reverting to defaults.', err);
     logDirPath = '.'      // Current directory
     logIntervalMs = 60000 // 1 min
-    maxLogEntries = 1440  // 24 hrs at 1/min
   }
 
   // Create log directory path if it doesn't already exist.
@@ -50,6 +48,38 @@ function writeLog(filePath, log) {
   catch (err) {
     console.warn('Error writing log for ' + device.alias + ' [' + device.deviceId + ']', err);
   }
+}
+
+function getLogEntriesForList(filePaths, callback) {
+  let logs = [];
+  filePaths.forEach(filePath => {
+    var hasError = false;
+    try{
+      var contents = fs.accessSync(filePath,fs.constants.F_OK);
+    }
+    catch(err){
+      hasError = true;
+      writeLog(filePath, []);
+    }
+    
+    if(!hasError){
+      hasError= false;
+      try{
+        contents = fs.readFileSync(filePath, 'utf8');
+      }
+      catch(err){
+        hasError = true;
+        console.warn('Error reading usage log ' + filePath, err);            
+      }
+
+      if(!hasError){
+        var parsedData = JSON.parse(contents);
+        console.log('appending data', parsedData);
+        logs = logs.concat(parsedData);            
+      }      
+    }
+  });  
+  callback(logs);
 }
 
 function getLogEntries(filePath, callback) {
@@ -86,11 +116,7 @@ function log(device) {
     let filePath = getLogPath(device.deviceId);
 
     getLogEntries(filePath, (entries) => {
-      entries.push(logEntry)
-
-      // Remove old entries
-      entries.splice(0, entries.length - maxLogEntries);
-
+      entries.push(logEntry);      
       writeLog(filePath, entries);
       dataBroadcaster.broadcastNewLogEntry(device.deviceId, logEntry);
     })
@@ -99,11 +125,18 @@ function log(device) {
 }
 
 function getLogPath(deviceId) {
-  return path.join(logDirPath, deviceId + '-log.json');
+  var currentDate = DateTime.local().toFormat('yyyyMMdd');
+  return path.join(logDirPath, deviceId + '_'+currentDate+'_log.json');
 }
 
-function getLogEntriesForDevice(deviceId, callback) {
-  return getLogEntries(getLogPath(deviceId), callback);
+function getAllLogPaths(deviceId){  
+  var searchPattern = path.join(logDirPath, deviceId + '_*_log.json');
+  var foundFiles = glob.sync(searchPattern);
+  return foundFiles;
+}
+
+function getLogEntriesForDevice(deviceId, callback) {  
+  return getLogEntriesForList(getAllLogPaths(deviceId), callback);
 }
 
 module.exports = {

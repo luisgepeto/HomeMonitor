@@ -50,9 +50,6 @@ By default this app will log the current power usage of each plug every minute, 
 
   // The number of seconds between each log entry
   "logIntervalSeconds": 60,
-
-  // The maximum number of log entries to store
-  "maxLogEntries": 1440 // 24hrs at 1 log/min
 }
 ```
 
