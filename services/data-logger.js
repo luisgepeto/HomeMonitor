@@ -4,6 +4,7 @@ const shell = require('shelljs');
 const dataBroadcaster = require('./data-broadcaster');
 const { DateTime } = require('luxon');
 const glob = require('glob');
+const iotLogger = require('./iot-logger');
 
 let logDirPath;
 let logIntervalMs;
@@ -92,6 +93,7 @@ function log(device) {
       pw: (('power_mw' in response) ? (response.power_mw / 1000) : response.power)
     }
 
+    iotLogger.log(device.deviceId, logEntry);
     let filePath = getLogPath(device.deviceId);
 
     getLogEntries(filePath, (entries) => {

@@ -1,6 +1,8 @@
 const { Client } = require('tplink-smarthome-api');
 const dataLogger = require('./data-logger');
+const iotLogger = require('./iot-logger');
 const interfaces = require('os').networkInterfaces();
+
 
 var devices = [];
 
@@ -26,7 +28,9 @@ function registerPlug(plug) {
   if (plug.supportsEmeter) {
     console.log('Found device with energy monitor support: ' + plug.alias + ' [' + plug.deviceId + ']');
     devices.push(plug);
+    iotLogger.registerIfNotExists(plug);
     dataLogger.startLogging(plug);
+    
   } else {
     console.log('Skipping device: ' + plug.alias + ' [' + plug.deviceId + ']. Energy monitoring not supported.');
   }

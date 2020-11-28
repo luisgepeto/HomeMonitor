@@ -12,6 +12,8 @@
     "dist": "pkg . --out-path ./dist"
   },
   "dependencies": {
+    "azure-iot-device": "^1.17.3",
+    "azure-iothub": "^1.13.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
